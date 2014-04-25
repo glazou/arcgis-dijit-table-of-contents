@@ -127,7 +127,10 @@ function (
             if (layers && layers.length) {
                 for (var i = 0; i < layers.length; i++) {
                     var layer = layers[i];
-                    // ceckbox class
+                    var layerObject = layer.layerObject || (layer.featureCollection ? layer.featureCollection.layers[0].layerObject : null);
+                    if(!layerObject)
+                        continue;
+                    // checkbox class
                     var titleCheckBoxClass = this.css.titleCheckbox;
                     // layer class
                     var layerClass = this.css.layer;
@@ -136,7 +139,7 @@ function (
                         layerClass += ' ';
                         layerClass += this.css.firstLayer;
                     }
-                    if (layer.visibility) {
+                    if(layerObject.visible){
                         layerClass += ' ';
                         layerClass += this.css.visible;
                         titleCheckBoxClass += ' ';
@@ -329,12 +332,10 @@ function (
                 if (featureCollection) {
                     // visible feature layers
                     visibleLayers = layer.visibleLayers;
-                    // new visibility
-                    newVis = !layer.visibility;
-                    // set visibility for layer reference
-                    layer.visibility = newVis;
                     // toggle all feature collection layers
                     if (visibleLayers && visibleLayers.length) {
+                        // new visibility
+                        newVis = ! featureCollection.layers[visibleLayers[0]].layerObject.visible;
                         // toggle visible sub layers
                         for (i = 0; i < visibleLayers.length; i++) {
                             layerObject = featureCollection.layers[visibleLayers[i]].layerObject;
@@ -343,6 +344,8 @@ function (
                         }
                     }
                     else{
+                        // new visibility
+                        newVis = ! featureCollection.layers[0].layerObject.visible;
                         // toggle all sub layers
                         for (i = 0; i < featureCollection.layers.length; i++) {
                             layerObject = featureCollection.layers[i].layerObject;
@@ -352,7 +355,6 @@ function (
                     }
                 } else if(layerObject) {
                     newVis = !layer.layerObject.visible;
-                    layer.visibility = newVis;
                     layerObject.setVisibility(newVis);
                 }
             }
